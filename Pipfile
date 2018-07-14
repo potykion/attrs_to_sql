@@ -5,8 +5,13 @@ name = "pypi"
 
 [packages]
 attrs = "*"
+"jinja2" = "*"
 
 [dev-packages]
+pylint = "*"
+pytest = "*"
+mypy = "*"
+black = "*"
 
 [requires]
 python_version = "3.6"
