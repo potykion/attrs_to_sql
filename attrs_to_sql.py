@@ -30,10 +30,11 @@ def _field_to_column(field: attr.Attribute) -> str:
 
 
 def _build_column_type(field: attr.Attribute) -> str:
-    column_type = str(
-        field.metadata.get("type") or PY_SQL_TYPES.get(field.type) or _try_set_array_type(field)
+    column_type = (
+        cast(str, field.metadata.get("type"))
+        or PY_SQL_TYPES.get(cast(type, field.type))
+        or _try_set_array_type(field)
     )
-
     if not column_type:
         raise ValueError(f"Unsupported type: {field.type}")
 
