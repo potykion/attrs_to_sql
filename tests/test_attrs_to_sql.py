@@ -1,12 +1,13 @@
+from datetime import datetime
 import attr
-
 from attrs_to_sql import attrs_to_table
 
 
 @attr.s(auto_attribs=True)
 class Model:
-    id: int = attr.ib(metadata={"primary_key": True, "type": "bigint"})
+    id: int = attr.ib(metadata={"primary_key": True, "type": "bigint", "auto_inc": True})
     default_int: int = 1
+    created_datetime: datetime = attr.ib(factory=datetime.now)
 
 
 def test_attrs_to_table():

@@ -1,5 +1,6 @@
 CREATE TABLE public.model
 (
-    id bigint PRIMARY KEY,
-    default_int int DEFAULT 1
+    id bigserial PRIMARY KEY,
+    default_int int DEFAULT 1,
+    created_datetime timestamp
 );
