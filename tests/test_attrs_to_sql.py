@@ -3,13 +3,16 @@ import attr
 from attrs_to_sql import attrs_to_table
 
 
-@attr.s
+@attr.s(auto_attribs=True)
 class Model:
     id: int = attr.ib(metadata={"primary_key": True, "type": "bigint"})
+    default_int: int = 1
 
 
 def test_attrs_to_table():
     with open("tests/data/model.sql", encoding="utf-8") as f:
-        create_table_sql = f.read()
+        expected_sql = f.read()
 
-    assert attrs_to_table(Model) == create_table_sql
+    actual_sql = attrs_to_table(Model)
+
+    assert actual_sql == expected_sql

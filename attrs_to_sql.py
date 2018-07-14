@@ -3,7 +3,7 @@ from jinja2 import Environment, FileSystemLoader, Template
 
 env = Environment(loader=FileSystemLoader("templates"), lstrip_blocks=True, trim_blocks=True)
 
-PY_SQL_TYPES = {int: "integer"}
+PY_SQL_TYPES = {int: "int"}
 
 
 def attrs_to_table(attrs: type) -> str:
@@ -30,6 +30,9 @@ def _build_column_extra(field: attr.Attribute) -> str:
 
     if field.metadata.get("primary_key"):
         column_extra.append("PRIMARY KEY")
+
+    if field.default != attr.NOTHING:
+        column_extra.append(f"DEFAULT {field.default}")
 
     column_extra_str = " ".join(column_extra)
     return column_extra_str
