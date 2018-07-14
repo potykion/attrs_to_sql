@@ -11,7 +11,7 @@ attrs = "*"
 pylint = "*"
 pytest = "*"
 mypy = "*"
-black = "*"
+black = "==18.6b4"
 
 [requires]
 python_version = "3.6"
