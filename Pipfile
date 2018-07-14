@@ -12,6 +12,9 @@ pylint = "*"
 pytest = "*"
 mypy = "*"
 black = "==18.6b4"
+setuptools = "*"
+wheel = "*"
+twine = "*"
 
 [requires]
 python_version = "3.6"
