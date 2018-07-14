@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import cast
+from typing import cast, Optional
 import attr
 from jinja2 import Environment, FileSystemLoader, Template
 
@@ -29,8 +29,8 @@ def _field_to_column(field: attr.Attribute) -> str:
     return column_str
 
 
-def _build_column_type(field):
-    column_type: str = (
+def _build_column_type(field: attr.Attribute) -> str:
+    column_type = str(
         field.metadata.get("type") or PY_SQL_TYPES.get(field.type) or _try_set_array_type(field)
     )
 
@@ -38,7 +38,7 @@ def _build_column_type(field):
         raise ValueError(f"Unsupported type: {field.type}")
 
     if field.metadata.get("length"):
-        return _append_length(column_type, field.metadata.get("length"))
+        return _append_length(column_type, cast(int, field.metadata.get("length")))
 
     if field.metadata.get("auto_inc"):
         return _map_auto_inc(column_type)
@@ -46,28 +46,30 @@ def _build_column_type(field):
     return column_type
 
 
-def _try_set_array_type(field):
-    if not issubclass(field.type, list):
-        return
+def _try_set_array_type(field: attr.Attribute) -> Optional[str]:
+    if not issubclass(cast(type, field.type), list):
+        return None
 
     try:
-        list_type = field.type.__args__[0]
+        list_type = field.type.__args__[0]  # type: ignore
     except IndexError:
         raise ValueError("No array type provided.")
 
     list_type = PY_SQL_TYPES.get(list_type)
-    if list_type:
-        return f"{list_type}[]"
+    if not list_type:
+        return None
+
+    return f"{list_type}[]"
 
 
-def _append_length(column_type, length):
+def _append_length(column_type: str, length: int) -> str:
     if column_type == "varchar":
         return f"varchar({length})"
     else:
         raise ValueError("Only varchar supported.")
 
 
-def _map_auto_inc(column_type):
+def _map_auto_inc(column_type: str) -> str:
     if column_type == "int":
         return "serial"
     elif column_type == "bigint":
