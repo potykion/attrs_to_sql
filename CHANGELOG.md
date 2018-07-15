@@ -2,6 +2,14 @@
 
 ## Unreleased 
 
+### Added
+
+- `Optional` type support
+
+### Fixed 
+
+- Ignore None default
+
 ## [0.0.4](https://github.com/potykion/attrs_to_sql/tree/0.0.4)
 
 ### Added

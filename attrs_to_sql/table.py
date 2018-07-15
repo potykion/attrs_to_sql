@@ -4,7 +4,7 @@ from typing import cast, Optional
 import attr
 from jinja2 import Environment, Template, PackageLoader
 
-from .utils import camelcase_to_underscore
+from .utils import camelcase_to_underscore, is_optional
 
 env = Environment(
     loader=PackageLoader("attrs_to_sql", "templates"), lstrip_blocks=True, trim_blocks=True
@@ -36,11 +36,7 @@ def _field_to_column(field: attr.Attribute) -> str:
 
 
 def _build_column_type(field: attr.Attribute) -> str:
-    column_type = (
-        cast(str, field.metadata.get("type"))
-        or PY_SQL_TYPES.get(cast(type, field.type))
-        or _try_set_array_type(field)
-    )
+    column_type = _try_identify_sql_type(field)
     if not column_type:
         raise ValueError(f"Unsupported type: {field.type}")
 
@@ -51,6 +47,19 @@ def _build_column_type(field: attr.Attribute) -> str:
         return _map_auto_inc(column_type)
 
     return column_type
+
+
+def _try_identify_sql_type(field):
+    if is_optional(field.type):
+        python_type = field.type.__args__[0]
+    else:
+        python_type = field.type
+
+    return (
+        cast(str, field.metadata.get("type"))
+        or PY_SQL_TYPES.get(python_type)
+        or _try_set_array_type(field)
+    )
 
 
 def _try_set_array_type(field: attr.Attribute) -> Optional[str]:
@@ -104,7 +113,7 @@ def _build_column_extra(field: attr.Attribute) -> str:
 
 
 def _try_compute_default(field: attr.Attribute) -> Optional[str]:
-    has_default = field.default != attr.NOTHING
+    has_default = field.default != attr.NOTHING and field.default is not None
     immutable_default = not isinstance(field.default, cast(type, attr.Factory))
     if not has_default or not immutable_default:
         return None
