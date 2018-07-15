@@ -1,7 +1,10 @@
 from datetime import datetime
 from typing import cast, Optional
+
 import attr
 from jinja2 import Environment, FileSystemLoader, Template
+
+from .utils import camelcase_to_underscore
 
 env = Environment(loader=FileSystemLoader("templates"), lstrip_blocks=True, trim_blocks=True)
 
@@ -9,11 +12,13 @@ PY_SQL_TYPES = {int: "int", datetime: "timestamp", str: "varchar", float: "float
 
 
 def attrs_to_table(attrs: type) -> str:
+    table = camelcase_to_underscore(attrs.__name__)
+
     fields = attr.fields(attrs)
     columns = map(_field_to_column, fields)
 
     template: Template = env.get_template("create_table.sql")
-    return template.render(columns=columns)
+    return template.render(table=table, columns=columns)
 
 
 def _field_to_column(field: attr.Attribute) -> str:

@@ -1,4 +1,4 @@
-CREATE TABLE public.model
+CREATE TABLE public.sample_model
 (
     id bigserial PRIMARY KEY,
     title varchar(30) NOT NULL,
