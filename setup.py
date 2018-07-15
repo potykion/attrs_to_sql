@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="attrs_to_sql",
-    version="0.0.2",
+    version="0.0.3",
     author="potykion",
     author_email="potykion@gmail.com",
     description="Convert attrs class to CREATE TABLE command.",
