@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import List
 import attr
-from attrs_to_sql import attrs_to_table
+from attrs_to_sql.table import attrs_to_table
 
 
 @attr.s(auto_attribs=True)
