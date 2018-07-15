@@ -71,17 +71,18 @@ def _try_set_array_type(field: attr.Attribute) -> Optional[str]:
 def _append_length(column_type: str, length: int) -> str:
     if column_type == "varchar":
         return f"varchar({length})"
-    else:
-        raise ValueError("Only varchar supported.")
+
+    raise ValueError("Only varchar supported.")
 
 
 def _map_auto_inc(column_type: str) -> str:
     if column_type == "int":
         return "serial"
-    elif column_type == "bigint":
+
+    if column_type == "bigint":
         return "bigserial"
-    else:
-        raise ValueError("Only integer type can be autoincremented.")
+
+    raise ValueError("Only integer type can be autoincremented.")
 
 
 def _build_column_extra(field: attr.Attribute) -> str:

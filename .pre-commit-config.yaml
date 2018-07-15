@@ -1,0 +1,24 @@
+fail_fast: true
+repos:
+-   repo: local
+    hooks:
+    - id: pytest
+      name: pytest
+      entry: pipenv run pytest tests -x
+      pass_filenames: false
+      language: system
+    - id: mypy
+      name: mypy
+      entry: pipenv run mypy attrs_to_sql
+      pass_filenames: false
+      language: system
+    - id: pylint
+      name: pylint
+      entry: pipenv run pylint attrs_to_sql
+      pass_filenames: false
+      language: system
+    - id: black
+      name: black
+      entry: pipenv run black attrs_to_sql
+      pass_filenames: false
+      language: system
