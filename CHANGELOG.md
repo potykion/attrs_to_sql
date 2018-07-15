@@ -2,6 +2,8 @@
 
 ## Unreleased 
 
+## [0.0.3](https://github.com/potykion/attrs_to_sql/tree/0.0.3)
+
 ### Fixed 
 
 - Use class name as table name instead of fixed name
