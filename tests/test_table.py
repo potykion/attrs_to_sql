@@ -13,6 +13,8 @@ class SampleModel:
     created_datetime: datetime = attr.ib(factory=datetime.now)
     ints: List[int] = attr.ib(factory=list)
     default_float: float = 2.5
+    order: int = 1
+    active: bool = False
 
 
 def test_attrs_to_table():

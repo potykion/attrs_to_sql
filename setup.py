@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="attrs_to_sql",
-    version="0.0.3",
+    version="0.0.4",
     author="potykion",
     author_email="potykion@gmail.com",
     description="Convert attrs class to CREATE TABLE command.",
@@ -18,4 +18,5 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ),
+    include_package_data=True,
 )

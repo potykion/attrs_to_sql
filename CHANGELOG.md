@@ -2,6 +2,17 @@
 
 ## Unreleased 
 
+## [0.0.4](https://github.com/potykion/attrs_to_sql/tree/0.0.4)
+
+### Added
+
+- `boolean` type support
+
+### Fixed
+
+- Move _templates_ dir to package
+- Column name escaping
+
 ## [0.0.3](https://github.com/potykion/attrs_to_sql/tree/0.0.3)
 
 ### Fixed 
@@ -10,7 +21,7 @@
 
 ## [0.0.2](https://github.com/potykion/attrs_to_sql/tree/0.0.2)
 
-### Added
+### Fixed
 
 - Convert `attrs_to_sql.py` to `attrs_to_sql` package
 

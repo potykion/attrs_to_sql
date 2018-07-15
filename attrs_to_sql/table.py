@@ -2,13 +2,15 @@ from datetime import datetime
 from typing import cast, Optional
 
 import attr
-from jinja2 import Environment, FileSystemLoader, Template
+from jinja2 import Environment, Template, PackageLoader
 
 from .utils import camelcase_to_underscore
 
-env = Environment(loader=FileSystemLoader("templates"), lstrip_blocks=True, trim_blocks=True)
+env = Environment(
+    loader=PackageLoader("attrs_to_sql", "templates"), lstrip_blocks=True, trim_blocks=True
+)
 
-PY_SQL_TYPES = {int: "int", datetime: "timestamp", str: "varchar", float: "float"}
+PY_SQL_TYPES = {int: "int", datetime: "timestamp", str: "varchar", float: "float", bool: "boolean"}
 
 
 def attrs_to_table(attrs: type) -> str:
@@ -24,8 +26,7 @@ def attrs_to_table(attrs: type) -> str:
 def _field_to_column(field: attr.Attribute) -> str:
     column_name = field.name
     column_type = _build_column_type(field)
-
-    column_str = f"{column_name} {column_type}"
+    column_str = f"\"{column_name}\" {column_type}"
 
     column_extra = _build_column_extra(field)
     if column_extra:
@@ -91,13 +92,26 @@ def _build_column_extra(field: attr.Attribute) -> str:
     if field.metadata.get("primary_key"):
         column_extra.append("PRIMARY KEY")
 
-    has_default = field.default != attr.NOTHING
-    immutable_default = not isinstance(field.default, cast(type, attr.Factory))
-    if has_default and immutable_default:
-        column_extra.append(f"DEFAULT {field.default}")
+    default = _try_compute_default(field)
+    if default:
+        column_extra.append(default)
 
     if field.metadata.get("not_null"):
         column_extra.append("NOT NULL")
 
     column_extra_str = " ".join(column_extra)
     return column_extra_str
+
+
+def _try_compute_default(field: attr.Attribute) -> Optional[str]:
+    has_default = field.default != attr.NOTHING
+    immutable_default = not isinstance(field.default, cast(type, attr.Factory))
+    if not has_default or not immutable_default:
+        return None
+
+    if field.type is bool:
+        default_value = "TRUE" if field.default else "FALSE"
+    else:
+        default_value = str(field.default)
+
+    return f"DEFAULT {default_value}"
