@@ -5,10 +5,12 @@
 ### Added
 
 - `Optional` type support
+- Add imports to `__init__.py`
+- Add _jinja2_ and _attrs_ to `install_requires`
 
 ### Fixed 
 
-- Ignore None default
+- Ignore `None` default
 
 ## [0.0.4](https://github.com/potykion/attrs_to_sql/tree/0.0.4)
 

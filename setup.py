@@ -3,6 +3,11 @@ import setuptools
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
+requirements = [
+    "attrs>=18.1.0",
+    "jinja2>=2.10"
+]
+
 setuptools.setup(
     name="attrs_to_sql",
     version="0.0.4",
@@ -12,6 +17,7 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/potykion/attrs_to_sql",
+    install_requires=requirements,
     packages=setuptools.find_packages(),
     classifiers=(
         "Programming Language :: Python :: 3",
