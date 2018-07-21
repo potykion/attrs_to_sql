@@ -4,7 +4,7 @@ from typing import cast, Optional
 import attr
 from jinja2 import Environment, Template, PackageLoader
 
-from .utils import camelcase_to_underscore, is_optional
+from .utils import camelcase_to_underscore, is_optional, is_typing_list
 
 env = Environment(
     loader=PackageLoader("attrs_to_sql", "templates"), lstrip_blocks=True, trim_blocks=True
@@ -63,7 +63,7 @@ def _try_identify_sql_type(field):
 
 
 def _try_set_array_type(field: attr.Attribute) -> Optional[str]:
-    if not issubclass(cast(type, field.type), list):
+    if not is_typing_list(field.type) and not issubclass(cast(type, field.type), list):
         return None
 
     try:

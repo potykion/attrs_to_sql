@@ -12,3 +12,7 @@ def camelcase_to_underscore(camelcase: str) -> str:
 
 def is_optional(type_: typing.Any) -> bool:
     return bool(re.match(r"^typing.Union\[.*?, NoneType\]$", str(type_)))
+
+
+def is_typing_list(type_: typing.Any) -> bool:
+    return bool(re.match(r"^typing.List\[.*?\]$", str(type_)))

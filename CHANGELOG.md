@@ -11,6 +11,7 @@
 ### Fixed 
 
 - Ignore `None` default
+- Fix `List` type check on Python 3.7
 
 ## [0.0.4](https://github.com/potykion/attrs_to_sql/tree/0.0.4)
 
