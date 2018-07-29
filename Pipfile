@@ -16,6 +16,7 @@ setuptools = "*"
 wheel = "*"
 twine = "*"
 pre-commit = "*"
+"bump2version" = "*"
 
 [requires]
 python_version = "3.6"
