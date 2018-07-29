@@ -4,13 +4,20 @@ from typing import cast, Optional
 import attr
 from jinja2 import Environment, Template, PackageLoader
 
-from .utils import camelcase_to_underscore, is_optional, is_typing_list
+from .utils import camelcase_to_underscore, is_optional, is_typing_list, is_typing_dict
 
 env = Environment(
     loader=PackageLoader("attrs_to_sql", "templates"), lstrip_blocks=True, trim_blocks=True
 )
 
-PY_SQL_TYPES = {int: "int", datetime: "timestamp", str: "varchar", float: "float", bool: "boolean"}
+PY_SQL_TYPES = {
+    int: "int",
+    datetime: "timestamp",
+    str: "varchar",
+    float: "float",
+    bool: "boolean",
+    dict: "json",
+}
 
 
 def attrs_to_table(attrs: type) -> str:
@@ -50,32 +57,51 @@ def _build_column_type(field: attr.Attribute) -> str:
 
 
 def _try_identify_sql_type(field):
+    if field.metadata.get("type"):
+        return str(field.metadata.get("type"))
+
     if is_optional(field.type):
         python_type = field.type.__args__[0]
     else:
         python_type = field.type
 
-    return (
-        cast(str, field.metadata.get("type"))
-        or PY_SQL_TYPES.get(python_type)
-        or _try_set_array_type(field)
-    )
+    if PY_SQL_TYPES.get(python_type):
+        return PY_SQL_TYPES.get(python_type)
+
+    return _try_set_json_type(field) or _try_set_array_type(field)
+
+
+def _try_set_json_type(field: attr.Attribute) -> Optional[str]:
+    is_dict_type = is_typing_dict(field.type)
+    if is_dict_type:
+        return "json"
+
+    list_type = _try_extract_list_type(field.type)
+    is_dict_type = is_typing_dict(list_type)
+    if is_dict_type:
+        return "json"
+
+    return None
 
 
 def _try_set_array_type(field: attr.Attribute) -> Optional[str]:
-    if not is_typing_list(field.type) and not issubclass(cast(type, field.type), list):
+    if not is_typing_list(field.type):
         return None
 
+    list_type = _try_extract_list_type(field.type)
+
+    sql_type = PY_SQL_TYPES.get(list_type)
+    if not sql_type:
+        return None
+
+    return f"{sql_type}[]"
+
+
+def _try_extract_list_type(list_type):
     try:
-        list_type = field.type.__args__[0]  # type: ignore
+        return list_type.__args__[0]  # type: ignore
     except IndexError:
         raise ValueError("No array type provided.")
-
-    list_type = PY_SQL_TYPES.get(list_type)
-    if not list_type:
-        return None
-
-    return f"{list_type}[]"
 
 
 def _append_length(column_type: str, length: int) -> str:

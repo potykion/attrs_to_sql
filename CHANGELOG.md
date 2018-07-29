@@ -2,6 +2,10 @@
 
 ## Unreleased 
 
+### Added
+
+- `Dict` type as `json` postgres type
+
 ## [0.0.5](https://github.com/potykion/attrs_to_sql/tree/0.0.5)
 
 ### Added

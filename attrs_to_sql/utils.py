@@ -15,4 +15,10 @@ def is_optional(type_: typing.Any) -> bool:
 
 
 def is_typing_list(type_: typing.Any) -> bool:
-    return bool(re.match(r"^typing.List\[.*?\]$", str(type_)))
+    type_str = str(type_)
+    return type_str.startswith("typing.List") or type_str.startswith("list")
+
+
+def is_typing_dict(type_: typing.Any) -> bool:
+    type_str = str(type_)
+    return type_str.startswith("typing.Dict") or type_str.startswith("dict")
