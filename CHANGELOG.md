@@ -2,7 +2,7 @@
 
 ## Unreleased 
 
-## [0.0.6](https://github.com/potykion/attrs_to_sql/tree/0.0.6)
+## [0.0.6](https://github.com/potykion/attrs_to_sql/tree/v0.0.6)
 
 ### Added
 
