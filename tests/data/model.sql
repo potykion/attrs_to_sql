@@ -12,5 +12,6 @@ CREATE TABLE public.sample_model
     "json_data" json,
     "json_dict" json,
     "json_list" json,
-    "json_dict_with_type" json
+    "json_dict_with_type" json,
+    "enum_field" int DEFAULT 1
 );

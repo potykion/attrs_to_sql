@@ -1,4 +1,5 @@
 from datetime import datetime
+from enum import IntEnum
 from typing import cast, Optional
 
 import attr
@@ -12,6 +13,7 @@ env = Environment(
 
 PY_SQL_TYPES = {
     int: "int",
+    IntEnum: "int",
     datetime: "timestamp",
     str: "varchar",
     float: "float",
@@ -146,6 +148,8 @@ def _try_compute_default(field: attr.Attribute) -> Optional[str]:
 
     if field.type is bool:
         default_value = "TRUE" if field.default else "FALSE"
+    elif field.type is IntEnum:
+        default_value = str(int(cast(int, field.default)))
     else:
         default_value = str(field.default)
 

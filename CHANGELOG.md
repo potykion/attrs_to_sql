@@ -4,7 +4,8 @@
 
 ### Added
 
-- `Dict` type as `json` postgres type
+- `Dict` as `json` postgres type
+- `IntEnum` as `int` type 
 
 ## [0.0.5](https://github.com/potykion/attrs_to_sql/tree/0.0.5)
 

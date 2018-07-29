@@ -1,7 +1,13 @@
 from datetime import datetime
+from enum import IntEnum
 from typing import List, Optional, Dict, Any
 import attr
 from attrs_to_sql.table import attrs_to_table
+
+
+class SampleEnum(IntEnum):
+    one = 1
+    two = 2
 
 
 @attr.s(auto_attribs=True)
@@ -19,6 +25,7 @@ class SampleModel:
     json_dict: dict = attr.ib(factory=dict)
     json_list: List[Dict] = attr.ib(factory=list)
     json_dict_with_type: Dict[str, Any] = attr.ib(factory=dict)
+    enum_field: IntEnum = SampleEnum.one
 
 
 def test_attrs_to_table():
