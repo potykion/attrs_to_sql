@@ -11,7 +11,7 @@ CREATE TABLE public.sample_model
     "active" boolean DEFAULT FALSE,
     "json_data" json,
     "json_dict" json,
-    "json_list" json,
+    "json_list" json[],
     "json_dict_with_type" json,
     "enum_field" int DEFAULT 1
 );
