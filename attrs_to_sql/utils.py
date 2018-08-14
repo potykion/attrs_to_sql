@@ -10,7 +10,7 @@ def camelcase_to_underscore(camelcase: str) -> str:
     return lowered
 
 
-def is_optional(type_: typing.Any) -> bool:
+def is_optional(type_: typing.Type) -> bool:
     return bool(re.match(r"^typing.Union\[.*?, NoneType\]$", str(type_)))
 
 

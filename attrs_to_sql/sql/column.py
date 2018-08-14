@@ -1,6 +1,6 @@
 from datetime import datetime
 from enum import IntEnum
-from typing import Optional, cast
+from typing import Optional, cast, Type
 
 import attr
 
@@ -34,32 +34,33 @@ def _build_column_name(field: attr.Attribute) -> str:
 
 
 def _build_column_type(field: attr.Attribute) -> str:
-    column_type = _try_identify_sql_type(field)
+    column_type = _try_guess_column_type(field)
     if not column_type:
         raise ValueError(f"Unsupported type: {field.type}")
 
-    if field.metadata.get("length"):
-        return _append_length(column_type, cast(int, field.metadata.get("length")))
-
-    if field.metadata.get("auto_inc"):
-        return _map_auto_inc(column_type)
-
-    return column_type
+    return _process_special_column_types(column_type, field) or column_type
 
 
-def _try_identify_sql_type(field):
-    if field.metadata.get("type"):
-        return str(field.metadata.get("type"))
+def _try_guess_column_type(field: attr.Attribute) -> Optional[str]:
+    type_extractors = [
+        _try_set_type_meta,
+        _try_set_sql_type,
+        _try_set_json_type,
+        _try_set_array_type,
+    ]
+    return next(filter(None, map(lambda extractor: extractor(field), type_extractors)), None)
 
-    if is_optional(field.type):
-        python_type = field.type.__args__[0]
-    else:
-        python_type = field.type
 
-    if PY_SQL_TYPES.get(python_type):
-        return PY_SQL_TYPES.get(python_type)
+def _try_set_type_meta(field: attr.Attribute) -> Optional[str]:
+    return field.metadata.get("type")
 
-    return _try_set_json_type(field) or _try_set_array_type(field)
+
+def _try_set_sql_type(field: attr.Attribute) -> Optional[str]:
+    field_type = cast(Type, field.type)
+    if is_optional(field_type):
+        field_type = field_type.__args__[0]
+
+    return PY_SQL_TYPES.get(field_type)
 
 
 def _try_set_json_type(field: attr.Attribute) -> Optional[str]:
@@ -95,21 +96,16 @@ def _try_extract_list_type(list_type):
         raise ValueError("No array type provided.")
 
 
-def _append_length(column_type: str, length: int) -> str:
+def _process_special_column_types(column_type, field):
     if column_type == "varchar":
+        length = field.metadata.get("length")
         return f"varchar({length})"
 
-    raise ValueError("Only varchar supported.")
+    if column_type in ["int", "bigint"]:
+        if field.metadata.get("auto_inc"):
+            return column_type.replace("int", "serial")
 
-
-def _map_auto_inc(column_type: str) -> str:
-    if column_type == "int":
-        return "serial"
-
-    if column_type == "bigint":
-        return "bigserial"
-
-    raise ValueError("Only integer type can be autoincremented.")
+    return None
 
 
 # column extra (pk, default, not null)
