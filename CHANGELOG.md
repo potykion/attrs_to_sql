@@ -2,6 +2,8 @@
 
 ## Unreleased 
 
+- `List[Dict]` as `json[]`
+
 ## [0.0.6](https://github.com/potykion/attrs_to_sql/tree/v0.0.6)
 
 ### Added
