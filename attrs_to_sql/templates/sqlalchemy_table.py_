@@ -1,0 +1,10 @@
+import sqlalchemy as sa
+
+metadata = sa.MetaData()
+
+{{ table }} = sa.Table(
+    "{{ table }}", metadata,
+    {% for column in columns %}
+    {{ column }},
+    {% endfor %}
+)
