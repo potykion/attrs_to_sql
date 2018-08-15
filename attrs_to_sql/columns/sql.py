@@ -9,7 +9,6 @@ from attrs_to_sql.utils import is_optional, is_typing_dict, is_typing_list, join
 
 PY_SQL_TYPES = {
     int: "int",
-    IntEnum: "int",
     datetime: "timestamp",
     str: "varchar",
     float: "float",
@@ -27,7 +26,11 @@ def _try_set_sql_type(field: attr.Attribute) -> Optional[str]:
     if is_optional(field_type):
         field_type = field_type.__args__[0]
 
-    return PY_SQL_TYPES.get(field_type)
+    if field_type in PY_SQL_TYPES:
+        return PY_SQL_TYPES[field_type]
+
+    if issubclass(field_type, IntEnum):
+        return "int"
 
 
 def _try_set_json_type(field: attr.Attribute) -> Optional[str]:
@@ -103,7 +106,7 @@ def _try_compute_default(field: attr.Attribute) -> Optional[str]:
 
     if field.type is bool:
         default_value = "TRUE" if field.default else "FALSE"
-    elif field.type is IntEnum:
+    elif issubclass(field.type, IntEnum):
         default_value = str(int(cast(int, field.default)))
     else:
         default_value = str(field.default)
