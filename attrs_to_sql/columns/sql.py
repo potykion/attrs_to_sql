@@ -4,6 +4,7 @@ from typing import Optional, cast, Type
 
 import attr
 
+from attrs_to_sql.columns.converter import ColumnConverter
 from attrs_to_sql.utils import is_optional, is_typing_dict, is_typing_list, join_not_none
 
 PY_SQL_TYPES = {
@@ -15,40 +16,6 @@ PY_SQL_TYPES = {
     bool: "boolean",
     dict: "json",
 }
-
-
-def field_to_column(field: attr.Attribute) -> str:
-    return join_not_none(
-        [_build_column_name(field), _build_column_type(field), _build_column_extra(field)]
-    )
-
-
-# column name
-
-
-def _build_column_name(field: attr.Attribute) -> str:
-    return f'"{field.name}"'
-
-
-# column type
-
-
-def _build_column_type(field: attr.Attribute) -> str:
-    column_type = _try_guess_column_type(field)
-    if not column_type:
-        raise ValueError(f"Unsupported type: {field.type}")
-
-    return _process_special_column_types(column_type, field) or column_type
-
-
-def _try_guess_column_type(field: attr.Attribute) -> Optional[str]:
-    type_extractors = [
-        _try_set_type_meta,
-        _try_set_sql_type,
-        _try_set_json_type,
-        _try_set_array_type,
-    ]
-    return next(filter(None, map(lambda extractor: extractor(field), type_extractors)), None)
 
 
 def _try_set_type_meta(field: attr.Attribute) -> Optional[str]:
@@ -96,6 +63,18 @@ def _try_extract_list_type(list_type):
         raise ValueError("No array type provided.")
 
 
+type_extractors = [
+    _try_set_type_meta,
+    _try_set_sql_type,
+    _try_set_json_type,
+    _try_set_array_type,
+]
+
+
+def _try_guess_column_type(field: attr.Attribute) -> Optional[str]:
+    return next(filter(None, map(lambda extractor: extractor(field), type_extractors)), None)
+
+
 def _process_special_column_types(column_type, field):
     if column_type == "varchar":
         length = field.metadata.get("length")
@@ -106,19 +85,6 @@ def _process_special_column_types(column_type, field):
             return column_type.replace("int", "serial")
 
     return None
-
-
-# column extra (pk, default, not null)
-
-
-def _build_column_extra(field: attr.Attribute) -> str:
-    return join_not_none(
-        [
-            "PRIMARY KEY" if _check_is_pk(field) else None,
-            "NOT NULL" if _check_is_not_null(field) else None,
-            _try_compute_default(field),
-        ]
-    )
 
 
 def _check_is_pk(field: attr.Attribute) -> bool:
@@ -143,3 +109,30 @@ def _try_compute_default(field: attr.Attribute) -> Optional[str]:
         default_value = str(field.default)
 
     return f"DEFAULT {default_value}"
+
+
+class SqlColumnConverter(ColumnConverter):
+    def _build_column_str(self, field: attr.Attribute) -> str:
+        return f"{self._build_column_name(field)} {self._build_column_type(field)}"
+
+    def _build_column_type(self, field: attr.Attribute) -> str:
+        column_type = _try_guess_column_type(field)
+        if not column_type:
+            raise ValueError(f"Unsupported type: {field.type}")
+
+        column_type = _process_special_column_types(column_type, field) or column_type
+
+        column_extra = self._build_column_extra(field)
+        if column_extra:
+            column_type = f"{column_type} {column_extra}"
+
+        return column_type
+
+    def _build_column_extra(self, field) -> str:
+        return join_not_none(
+            [
+                "PRIMARY KEY" if _check_is_pk(field) else None,
+                "NOT NULL" if _check_is_not_null(field) else None,
+                _try_compute_default(field),
+            ]
+        )

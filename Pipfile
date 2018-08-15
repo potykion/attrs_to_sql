@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 attrs = "*"
 "jinja2" = "*"
+sqlalchemy = "*"
 
 [dev-packages]
 pylint = "*"
