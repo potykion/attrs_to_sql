@@ -24,5 +24,5 @@ def is_typing_dict(type_: typing.Any) -> bool:
     return type_str.startswith("typing.Dict") or type_ is dict
 
 
-def join_not_none(iter_: typing.Iterable[typing.Optional[str]], sep: str = " "):
+def join_not_none(iter_: typing.Iterable[typing.Optional[str]], sep: str = " ") -> str:
     return sep.join(filter(None, iter_))

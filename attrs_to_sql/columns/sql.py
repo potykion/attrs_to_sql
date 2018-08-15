@@ -4,7 +4,7 @@ from typing import Optional, cast, Type
 
 import attr
 
-from attrs_to_sql.columns.converter import ColumnConverter
+from attrs_to_sql.columns.converter import ColumnConverter, extract_field_type
 from attrs_to_sql.utils import is_optional, is_typing_dict, is_typing_list, join_not_none
 
 PY_SQL_TYPES = {
@@ -22,15 +22,15 @@ def _try_set_type_meta(field: attr.Attribute) -> Optional[str]:
 
 
 def _try_set_sql_type(field: attr.Attribute) -> Optional[str]:
-    field_type = cast(Type, field.type)
-    if is_optional(field_type):
-        field_type = field_type.__args__[0]
+    field_type = extract_field_type(field)
 
     if field_type in PY_SQL_TYPES:
         return PY_SQL_TYPES[field_type]
 
     if issubclass(field_type, IntEnum):
         return "int"
+
+    return None
 
 
 def _try_set_json_type(field: attr.Attribute) -> Optional[str]:
@@ -106,7 +106,7 @@ def _try_compute_default(field: attr.Attribute) -> Optional[str]:
 
     if field.type is bool:
         default_value = "TRUE" if field.default else "FALSE"
-    elif issubclass(field.type, IntEnum):
+    elif issubclass(cast(Type, field.type), IntEnum):
         default_value = str(int(cast(int, field.default)))
     else:
         default_value = str(field.default)
