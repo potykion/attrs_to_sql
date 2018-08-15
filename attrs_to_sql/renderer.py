@@ -1,3 +1,5 @@
+from typing import Any
+
 from jinja2 import Environment, PackageLoader, Template
 
 env = Environment(
@@ -5,6 +7,6 @@ env = Environment(
 )
 
 
-def render(template_name, **kwargs):
+def render(template_name: str, **kwargs: Any) -> str:
     template: Template = env.get_template(template_name)
     return template.render(**kwargs)
