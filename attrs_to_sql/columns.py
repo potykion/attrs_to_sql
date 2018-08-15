@@ -178,9 +178,10 @@ def _try_compute_default(field: attr.Attribute) -> Optional[str]:
     if not has_default or not immutable_default:
         return None
 
-    if field.type is bool:
+    type_ = extract_field_type(field)
+    if type_ is bool:
         default_value = "TRUE" if field.default else "FALSE"
-    elif issubclass(cast(Type, field.type), IntEnum):
+    elif issubclass(type_, IntEnum):
         default_value = str(int(cast(int, field.default)))
     else:
         default_value = str(field.default)
