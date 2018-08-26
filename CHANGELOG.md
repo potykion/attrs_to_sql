@@ -2,6 +2,12 @@
 
 ## Unreleased 
 
+## [0.2.0](https://github.com/potykion/attrs_to_sql/tree/v0.2.0)
+
+### Added 
+
+- SqlAlchemy table > attrs
+
 ## [0.1.0](https://github.com/potykion/attrs_to_sql/tree/v0.1.0)
 
 ### Added 
