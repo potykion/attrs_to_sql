@@ -1,6 +1,6 @@
 import re
 import typing
-from typing import Union, Type, cast, Any
+from typing import Union, Type, cast, Any, List
 
 import attr
 
@@ -18,13 +18,11 @@ def is_optional(type_: typing.Type) -> bool:
 
 
 def is_typing_list(type_: typing.Any) -> bool:
-    type_str = str(type_)
-    return type_str.startswith("typing.List") or type_str.startswith("list")
+    return issubclass(type_, List)
 
 
 def is_typing_dict(type_: typing.Any) -> bool:
-    type_str = str(type_)
-    return type_str.startswith("typing.Dict") or type_ is dict
+    return issubclass(type_, typing.Dict)
 
 
 def join_not_none(iter_: typing.Iterable[typing.Optional[str]], sep: str = " ") -> str:

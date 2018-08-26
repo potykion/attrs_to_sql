@@ -1,0 +1,5 @@
+@attr.s(auto_attribs=True)
+class {{ title }}:
+    {% for field in fields %}
+    {{ field }}
+    {% endfor %}

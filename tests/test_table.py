@@ -1,7 +1,11 @@
 from datetime import datetime
 from enum import IntEnum
 from typing import List, Optional, Dict, Any
+
 import attr
+import sqlalchemy as sa
+
+from attrs_to_sql.sql_to_attrs import sqlalchemy_to_attrs
 from attrs_to_sql.table import attrs_to_table, attrs_to_sqlalchemy_table
 
 
@@ -28,6 +32,19 @@ class SampleModel:
     enum_field: SampleEnum = SampleEnum.one
 
 
+metadata = sa.MetaData()
+
+entities = sa.Table(
+    "entities",
+    metadata,
+    sa.Column("id", sa.BigInteger, primary_key=True, autoincrement=True),
+    sa.Column("title", sa.Unicode),
+    sa.Column("address", sa.JSON),
+    sa.Column("active", sa.Boolean, default=True),
+    sa.Column("emails", sa.ARRAY(sa.Unicode))
+)
+
+
 def test_attrs_to_table():
     with open("tests/data/model.sql", encoding="utf-8") as f:
         expected_sql = f.read()
@@ -44,3 +61,10 @@ def test_attrs_to_sql_alchemy():
     actual = attrs_to_sqlalchemy_table(SampleModel)
 
     assert actual == expected_sql
+
+
+def test_sqlalchemy_to_attrs():
+    with open("tests/data/attrs_model.py", encoding="utf-8") as f:
+        expected_attrs = f.read()
+
+    assert sqlalchemy_to_attrs(entities, class_name="Entity") == expected_attrs
