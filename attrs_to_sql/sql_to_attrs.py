@@ -1,6 +1,7 @@
 from typing import Iterable
 
 import sqlalchemy as sa
+from sqlalchemy import ColumnDefault
 from sqlalchemy.sql.type_api import TypeEngine
 
 from attrs_to_sql.renderer import render
@@ -16,9 +17,11 @@ def _build_fields(columns: Iterable[sa.Column]) -> Iterable[str]:
     for column in columns:
         column_name = column.name
 
-        column_type_name = _build_column_type_str(column.type)
+        column_type_str = _build_column_type_str(column.type)
 
-        yield f"{column_name}: {column_type_name}"
+        column_default = _build_column_default(column)
+
+        yield f"{column_name}: {column_type_str}{column_default}"
 
 
 def _build_column_type_str(column_type: TypeEngine) -> str:
@@ -30,3 +33,11 @@ def _build_column_type_str(column_type: TypeEngine) -> str:
         return "Dict"
 
     return column_type.python_type.__name__
+
+
+def _build_column_default(column: sa.Column) -> str:
+    if column.default:
+        column_default: ColumnDefault = column.default
+        return f" = {column_default.arg}"
+
+    return ""

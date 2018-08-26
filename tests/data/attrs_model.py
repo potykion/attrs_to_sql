@@ -3,5 +3,5 @@ class Entity:
     id: int
     title: str
     address: Dict
-    active: bool
+    active: bool = True
     emails: List[str]
