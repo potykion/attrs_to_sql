@@ -10,7 +10,7 @@ requirements = [
 
 setuptools.setup(
     name="attrs_to_sql",
-    version="0.1.0",
+    version="0.2.0",
     author="potykion",
     author_email="potykion@gmail.com",
     description="Convert attrs class to CREATE TABLE command.",
